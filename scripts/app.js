@@ -1,5 +1,53 @@
+const records = JSON.parse(localStorage.getItem("records")) || [];
+
 const form = document.getElementById("record-form");
 const message = document.getElementById("form-message");
+
+// =========================
+// Display RECORDS
+// =========================
+function renderRecords() {
+
+    const recordsBody =
+        document.getElementById("records-body");
+
+    recordsBody.innerHTML = "";
+
+    records.forEach(record => {
+
+        const newRow =
+            document.createElement("tr");
+
+        newRow.innerHTML = `
+            <td>${record.description}</td>
+            <td>${record.amount}</td>
+            <td>${record.category}</td>
+            <td>${record.date}</td>
+        `;
+
+        recordsBody.appendChild(newRow);
+    });
+}
+
+// =========================
+// DASHBOARD
+// =========================
+function updateDashboard() {
+
+    const totalTransactions = records.length;
+
+    let totalSpending = 0;
+
+    records.forEach(record => {
+        totalSpending += record.amount;
+    });
+
+    document.getElementById("total-transactions").textContent =
+        totalTransactions;
+
+    document.getElementById("total-spending").textContent =
+        "$" + totalSpending.toFixed(2);
+}
 
 form.addEventListener("submit", function (event) {
 
@@ -17,78 +65,58 @@ form.addEventListener("submit", function (event) {
     const date =
         document.getElementById("date").value;
 
-    const descriptionRegex =
-        /^\S(?:.*\S)?$/;
-
-    const amountRegex =
-        /^(0|[1-9]\d*)(\.\d{1,2})?$/;
-
-    const categoryRegex =
-        /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
-
-    const dateRegex =
-        /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+    // VALIDATION
+    const descriptionRegex = /^\S(?:.*\S)?$/;
+    const amountRegex = /^(0|[1-9]\d*)(\.\d{1,2})?$/;
+    const categoryRegex = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
+    const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
     if (!descriptionRegex.test(description)) {
-
-        message.textContent =
-            "Invalid description.";
-
+        message.textContent = "Invalid description.";
         return;
     }
-    const duplicateWordRegex =
-    /\b(\w+)\s+\1\b/i;
 
-if (duplicateWordRegex.test(description)) {
-
-    message.textContent =
-        "Duplicate word detected.";
-
-    return;
-}
+    if (/\b(\w+)\s+\1\b/i.test(description)) {
+        message.textContent = "Duplicate word detected.";
+        return;
+    }
 
     if (!amountRegex.test(amount)) {
-
-        message.textContent =
-            "Invalid amount.";
-
+        message.textContent = "Invalid amount.";
         return;
     }
 
     if (!categoryRegex.test(category)) {
-
-        message.textContent =
-            "Invalid category.";
-
+        message.textContent = "Invalid category.";
         return;
     }
 
     if (!dateRegex.test(date)) {
-
-        message.textContent =
-            "Invalid date.";
-
+        message.textContent = "Invalid date.";
         return;
     }
 
-    const recordsBody =
-    document.getElementById("records-body");
+    // CREATE RECORD
+    const record = {
+        id: Date.now(),
+        description,
+        amount: Number(amount),
+        category,
+        date,
+        createdAt: new Date().toISOString()
+    };
 
-const newRow =
-    document.createElement("tr");
+    // SAVE DATA
+    records.push(record);
+    localStorage.setItem("records", JSON.stringify(records));
 
-newRow.innerHTML = `
-    <td>${description}</td>
-    <td>${amount}</td>
-    <td>${category}</td>
-    <td>${date}</td>
-`;
+    // UPDATE UI
+    renderRecords();
+    updateDashboard();
 
-recordsBody.appendChild(newRow);
-
-message.textContent =
-    "Record added successfully.";
-
-form.reset();
-
+    message.textContent = "Record added successfully.";
+    form.reset();
 });
+
+renderRecords();
+updateDashboard();
