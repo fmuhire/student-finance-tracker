@@ -1,0 +1,145 @@
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+
+header {
+    background-color: #2563eb;
+    color: white;
+    padding: 1rem;
+}
+
+
+nav ul {
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.5rem;
+
+    margin-top: 1rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+
+main {
+    padding: 1rem;
+}
+
+
+section {
+    background: #f4f4f4;
+
+    padding: 1rem;
+
+    margin-bottom: 1rem;
+
+    border-radius: 8px;
+}
+
+
+@media (min-width: 768px) {
+
+    nav ul {
+        flex-direction: row;
+    }
+
+}
+
+
+@media (min-width: 1024px) {
+
+    main {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+}
+.dashboard-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+@media (min-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th,
+td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #2563eb;
+    color: white;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+input,
+button {
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+button {
+    cursor: pointer;
+}
+select {
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+#about ul {
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+}
+
+#about h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+#about p {
+    margin-bottom: 0.5rem;
+}
