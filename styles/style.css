@@ -14,7 +14,7 @@ body {
 
 
 header {
-    background-color: #09c5e2;
+    background-color: #9701c5;
     color: rgb(255, 255, 255);
     padding: 1rem;
 }
@@ -32,7 +32,7 @@ nav ul {
 }
 
 nav a {
-    color: white;
+    color: rgb(245, 245, 245);
     text-decoration: none;
 }
 
@@ -108,7 +108,7 @@ td {
 }
 
 th {
-    background: #eb253c;
+    background: #9212ae;
     color: white;
 }
 form {
@@ -156,7 +156,7 @@ select {
 
 #record-form input {
     padding: 0.75rem;
-    border: 1px solid #818181;
+    border: 1px solid #6f0d93;
     border-radius: 6px;
 }
 
@@ -169,4 +169,25 @@ select {
 
 #form-message {
     margin-top: 1rem;
+}
+button,
+input,
+select {
+    font-family: inherit;
+    font-size: 1rem;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }

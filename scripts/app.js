@@ -1,4 +1,5 @@
 const records = JSON.parse(localStorage.getItem("records")) || [];
+
 document.getElementById("budget-cap").value =
     localStorage.getItem("budgetCap") || "";
 
@@ -18,43 +19,35 @@ function renderRecords() {
     recordsBody.innerHTML = "";
 
     const searchTerm =
-    searchInput.value.toLowerCase();
+        searchInput.value.toLowerCase();
 
-const sortedRecords = [...records];
+    const sortedRecords = [...records];
 
-if (sortSelect.value === "newest") {
-
-    sortedRecords.sort((a, b) =>
-        b.id - a.id);
-
-}
-if (sortSelect.value === "oldest") {
-
-    sortedRecords.sort((a, b) =>
-        a.id - b.id);
-
-}
-if (sortSelect.value === "highest") {
-
-    sortedRecords.sort((a, b) =>
-        b.amount - a.amount);
-
-}
-if (sortSelect.value === "lowest") {
-
-    sortedRecords.sort((a, b) =>
-        a.amount - b.amount);
-
-}
-sortedRecords.forEach(record => {
-
-    const matchesSearch =
-        record.description.toLowerCase().includes(searchTerm) ||
-        record.category.toLowerCase().includes(searchTerm);
-
-    if (!matchesSearch) {
-        return;
+    if (sortSelect.value === "newest") {
+        sortedRecords.sort((a, b) => b.id - a.id);
     }
+
+    if (sortSelect.value === "oldest") {
+        sortedRecords.sort((a, b) => a.id - b.id);
+    }
+
+    if (sortSelect.value === "highest") {
+        sortedRecords.sort((a, b) => b.amount - a.amount);
+    }
+
+    if (sortSelect.value === "lowest") {
+        sortedRecords.sort((a, b) => a.amount - b.amount);
+    }
+
+    sortedRecords.forEach(record => {
+
+        const matchesSearch =
+            record.description.toLowerCase().includes(searchTerm) ||
+            record.category.toLowerCase().includes(searchTerm);
+
+        if (!matchesSearch) {
+            return;
+        }
 
         const newRow =
             document.createElement("tr");
@@ -64,6 +57,12 @@ sortedRecords.forEach(record => {
             <td>${record.amount}</td>
             <td>${record.category}</td>
             <td>${record.date}</td>
+
+            <td>
+                <button class="delete-btn" data-id="${record.id}">
+                    Delete
+                </button>
+            </td>
         `;
 
         recordsBody.appendChild(newRow);
@@ -94,7 +93,6 @@ function updateDashboard() {
         categoryTotals[record.category] += amount;
     });
 
-    // Find top category
     let topCategory = "None";
     let maxAmount = 0;
 
@@ -114,34 +112,46 @@ function updateDashboard() {
 
     document.getElementById("top-category").textContent =
         topCategory;
-        const budgetInput =
-    document.getElementById("budget-cap").value;
 
-const budgetStatus =
-    document.getElementById("budget-status");
+    const budgetInput =
+        document.getElementById("budget-cap").value;
 
-if (!budgetInput) {
+    const budgetStatus =
+        document.getElementById("budget-status");
 
-    budgetStatus.textContent = "No Budget Set";
-
-} else {
-
-    const budget = Number(budgetInput);
-
-    if (totalSpending > budget) {
-
-        budgetStatus.textContent = "Over Budget ⚠️";
-
+    if (!budgetInput) {
+        budgetStatus.textContent = "No Budget Set";
     } else {
+        const budget = Number(budgetInput);
 
-        budgetStatus.textContent = "Within Budget ✅";
-
+        if (totalSpending > budget) {
+            budgetStatus.textContent = "Over Budget ⚠️";
+        } else {
+            budgetStatus.textContent = "Within Budget ✅";
+        }
     }
 }
 
+// =========================
+// DELETE FUNCTION (FIXED PART)
+// =========================
+function deleteRecord(id) {
+
+    const index = records.findIndex(record => record.id === id);
+
+    if (index !== -1) {
+        records.splice(index, 1);
+    }
+
+    localStorage.setItem("records", JSON.stringify(records));
+
+    renderRecords();
+    updateDashboard();
 }
 
-
+// =========================
+// FORM SUBMIT
+// =========================
 form.addEventListener("submit", function (event) {
 
     event.preventDefault();
@@ -158,7 +168,6 @@ form.addEventListener("submit", function (event) {
     const date =
         document.getElementById("date").value;
 
-    // VALIDATION
     const descriptionRegex = /^\S(?:.*\S)?$/;
     const amountRegex = /^(0|[1-9]\d*)(\.\d{1,2})?$/;
     const categoryRegex = /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/;
@@ -189,7 +198,6 @@ form.addEventListener("submit", function (event) {
         return;
     }
 
-    // CREATE RECORD
     const record = {
         id: Date.now(),
         description,
@@ -199,11 +207,9 @@ form.addEventListener("submit", function (event) {
         createdAt: new Date().toISOString()
     };
 
-    // SAVE DATA
     records.push(record);
     localStorage.setItem("records", JSON.stringify(records));
 
-    // UPDATE UI
     renderRecords();
     updateDashboard();
 
@@ -211,24 +217,21 @@ form.addEventListener("submit", function (event) {
     form.reset();
 });
 
+// =========================
+// INIT
+// =========================
 renderRecords();
 updateDashboard();
 
-// SEARCH
-searchInput.addEventListener("input", function () {
+// =========================
+// SEARCH + SORT
+// =========================
+searchInput.addEventListener("input", renderRecords);
+sortSelect.addEventListener("change", renderRecords);
 
-    renderRecords();
-
-});
-
-// SORT
-sortSelect.addEventListener("change", function () {
-
-    renderRecords();
-
-});
-
-// BUDGET (SAFE)
+// =========================
+// BUDGET SAVE
+// =========================
 const budgetInputField =
     document.getElementById("budget-cap");
 
@@ -242,6 +245,10 @@ if (budgetInputField) {
 
     });
 }
+
+// =========================
+// EXPORT
+// =========================
 const exportBtn = document.getElementById("export-data");
 
 if (exportBtn) {
@@ -266,6 +273,10 @@ if (exportBtn) {
     });
 
 }
+
+// =========================
+// IMPORT
+// =========================
 const importBtn = document.getElementById("import-data");
 
 if (importBtn) {
@@ -295,7 +306,7 @@ if (importBtn) {
                         return;
                     }
 
-                    records.length = 0; // clear current records
+                    records.length = 0;
 
                     importedData.forEach(item => {
                         records.push(item);
@@ -323,3 +334,19 @@ if (importBtn) {
     });
 
 }
+
+
+// =========================
+document.addEventListener("click", function (e) {
+
+    if (e.target.classList.contains("delete-btn")) {
+
+        const id = Number(e.target.getAttribute("data-id"));
+
+        const confirmDelete = confirm("Are you sure you want to delete this record?");
+
+        if (confirmDelete) {
+            deleteRecord(id);
+        }
+    }
+});
