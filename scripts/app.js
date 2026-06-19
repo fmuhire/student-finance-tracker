@@ -1,4 +1,6 @@
 const records = JSON.parse(localStorage.getItem("records")) || [];
+document.getElementById("budget-cap").value =
+    localStorage.getItem("budgetCap") || "";
 
 const form = document.getElementById("record-form");
 const message = document.getElementById("form-message");
@@ -18,7 +20,33 @@ function renderRecords() {
     const searchTerm =
     searchInput.value.toLowerCase();
 
-records.forEach(record => {
+const sortedRecords = [...records];
+
+if (sortSelect.value === "newest") {
+
+    sortedRecords.sort((a, b) =>
+        b.id - a.id);
+
+}
+if (sortSelect.value === "oldest") {
+
+    sortedRecords.sort((a, b) =>
+        a.id - b.id);
+
+}
+if (sortSelect.value === "highest") {
+
+    sortedRecords.sort((a, b) =>
+        b.amount - a.amount);
+
+}
+if (sortSelect.value === "lowest") {
+
+    sortedRecords.sort((a, b) =>
+        a.amount - b.amount);
+
+}
+sortedRecords.forEach(record => {
 
     const matchesSearch =
         record.description.toLowerCase().includes(searchTerm) ||
@@ -51,16 +79,68 @@ function updateDashboard() {
 
     let totalSpending = 0;
 
+    const categoryTotals = {};
+
     records.forEach(record => {
-        totalSpending += record.amount;
+
+        const amount = Number(record.amount);
+
+        totalSpending += amount;
+
+        if (!categoryTotals[record.category]) {
+            categoryTotals[record.category] = 0;
+        }
+
+        categoryTotals[record.category] += amount;
     });
+
+    // Find top category
+    let topCategory = "None";
+    let maxAmount = 0;
+
+    for (let category in categoryTotals) {
+
+        if (categoryTotals[category] > maxAmount) {
+            maxAmount = categoryTotals[category];
+            topCategory = category;
+        }
+    }
 
     document.getElementById("total-transactions").textContent =
         totalTransactions;
 
     document.getElementById("total-spending").textContent =
         "$" + totalSpending.toFixed(2);
+
+    document.getElementById("top-category").textContent =
+        topCategory;
+        const budgetInput =
+    document.getElementById("budget-cap").value;
+
+const budgetStatus =
+    document.getElementById("budget-status");
+
+if (!budgetInput) {
+
+    budgetStatus.textContent = "No Budget Set";
+
+} else {
+
+    const budget = Number(budgetInput);
+
+    if (totalSpending > budget) {
+
+        budgetStatus.textContent = "Over Budget ⚠️";
+
+    } else {
+
+        budgetStatus.textContent = "Within Budget ✅";
+
+    }
 }
+
+}
+
 
 form.addEventListener("submit", function (event) {
 
@@ -134,8 +214,112 @@ form.addEventListener("submit", function (event) {
 renderRecords();
 updateDashboard();
 
+// SEARCH
 searchInput.addEventListener("input", function () {
 
     renderRecords();
 
 });
+
+// SORT
+sortSelect.addEventListener("change", function () {
+
+    renderRecords();
+
+});
+
+// BUDGET (SAFE)
+const budgetInputField =
+    document.getElementById("budget-cap");
+
+if (budgetInputField) {
+
+    budgetInputField.addEventListener("input", function () {
+
+        localStorage.setItem("budgetCap", budgetInputField.value);
+
+        updateDashboard();
+
+    });
+}
+const exportBtn = document.getElementById("export-data");
+
+if (exportBtn) {
+
+    exportBtn.addEventListener("click", function () {
+
+        const dataStr = JSON.stringify(records, null, 2);
+
+        const blob = new Blob([dataStr], { type: "application/json" });
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = "student-finance-data.json";
+
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+    });
+
+}
+const importBtn = document.getElementById("import-data");
+
+if (importBtn) {
+
+    importBtn.addEventListener("click", function () {
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "application/json";
+
+        input.addEventListener("change", function (event) {
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+
+                try {
+
+                    const importedData = JSON.parse(e.target.result);
+
+                    if (!Array.isArray(importedData)) {
+                        alert("Invalid file format");
+                        return;
+                    }
+
+                    records.length = 0; // clear current records
+
+                    importedData.forEach(item => {
+                        records.push(item);
+                    });
+
+                    localStorage.setItem("records", JSON.stringify(records));
+
+                    renderRecords();
+                    updateDashboard();
+
+                    alert("Data imported successfully!");
+
+                } catch (error) {
+                    alert("Error reading file");
+                }
+
+            };
+
+            reader.readAsText(file);
+
+        });
+
+        input.click();
+
+    });
+
+}
