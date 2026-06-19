@@ -14,8 +14,8 @@ body {
 
 
 header {
-    background-color: #2563eb;
-    color: white;
+    background-color: #09c5e2;
+    color: rgb(255, 255, 255);
     padding: 1rem;
 }
 
@@ -43,7 +43,7 @@ main {
 
 
 section {
-    background: #f4f4f4;
+    background: #f4f4f47b;
 
     padding: 1rem;
 
@@ -108,7 +108,7 @@ td {
 }
 
 th {
-    background: #2563eb;
+    background: #eb253c;
     color: white;
 }
 form {
@@ -156,7 +156,7 @@ select {
 
 #record-form input {
     padding: 0.75rem;
-    border: 1px solid #ccc;
+    border: 1px solid #818181;
     border-radius: 6px;
 }
 

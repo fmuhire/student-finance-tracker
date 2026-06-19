@@ -2,6 +2,8 @@ const records = JSON.parse(localStorage.getItem("records")) || [];
 
 const form = document.getElementById("record-form");
 const message = document.getElementById("form-message");
+const searchInput = document.getElementById("search-input");
+const sortSelect = document.getElementById("sort-select");
 
 // =========================
 // Display RECORDS
@@ -13,7 +15,18 @@ function renderRecords() {
 
     recordsBody.innerHTML = "";
 
-    records.forEach(record => {
+    const searchTerm =
+    searchInput.value.toLowerCase();
+
+records.forEach(record => {
+
+    const matchesSearch =
+        record.description.toLowerCase().includes(searchTerm) ||
+        record.category.toLowerCase().includes(searchTerm);
+
+    if (!matchesSearch) {
+        return;
+    }
 
         const newRow =
             document.createElement("tr");
@@ -120,3 +133,9 @@ form.addEventListener("submit", function (event) {
 
 renderRecords();
 updateDashboard();
+
+searchInput.addEventListener("input", function () {
+
+    renderRecords();
+
+});
