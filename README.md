@@ -54,4 +54,4 @@ M5 Dashboard calculations and budget tracking
 M6 Data persistence and import export system
 M7 Final polish and accessibility improvements
 
-Author: Muhire Fidel
+Author: Muhire Willy Fidel
